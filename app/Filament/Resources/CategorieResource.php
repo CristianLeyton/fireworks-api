@@ -12,6 +12,8 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Support\Enums\ActionSize;
+use Filament\Support\Enums\Alignment;
 
 class CategorieResource extends Resource
 {
@@ -30,14 +32,22 @@ class CategorieResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->label('Nombre: ')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->columnSpan([
+                        'default' => 'full',
+                        'lg' => 1,
+                    ]),
                 Forms\Components\FileUpload::make('urlImage')
                     ->label('Imagen: ')
                     ->image()
-                    ->required(),
+                    ->required()
+                    ->columnSpan([
+                        'default' => 'full',
+                        'lg' => 1,
+                    ]),
                 Forms\Components\Textarea::make('description')
                     ->label('Descripción: ')
-                    ->columnSpan(2),
+                    ->columnSpan('full'),
             ]),
         ];
     }   
@@ -63,20 +73,22 @@ class CategorieResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(isToggledHiddenByDefault: false)
+                    ->visibleFrom('md'),
                 Tables\Columns\TextColumn::make('updated_at')
                 ->label('Fecha de actualización')
                     ->dateTime()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->visibleFrom('md'),
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-               /*  Tables\Actions\ViewAction::make(), */
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ViewAction::make()->hiddenLabel()->size(ActionSize::ExtraSmall)->extraAttributes(['class' => 'hidden']),
+                Tables\Actions\EditAction::make()->button()->hiddenLabel()->size(ActionSize::Medium),
+                Tables\Actions\DeleteAction::make()->button()->hiddenLabel()->size(ActionSize::Medium),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

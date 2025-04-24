@@ -9,6 +9,8 @@ use App\Models\Product;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms;
+use Filament\Support\Enums\Alignment;
+use Filament\Support\Enums\ActionSize;
 
 class StockTable extends BaseWidget
 {
@@ -18,8 +20,8 @@ class StockTable extends BaseWidget
     {
         return $table
             ->query(
-                Product::query()->orderBy('quantity', 'asc') // 🔽 Ordenar stock de menor a mayor
-            )
+                Product::query()
+            )->defaultSort('quantity','asc')
             ->heading('Stock de productos')
             ->description('Si desea editar por completo un producto, dirigase a "Productos"')
             ->columns([
@@ -32,6 +34,7 @@ class StockTable extends BaseWidget
                     ->searchable(),
                 TextColumn::make('quantity')
                     ->label('Cantidad')
+                    ->alignment(Alignment::Center)
                     ->sortable()
                     ->color(fn($state) => match (true) {
                         $state < 5 => 'danger',   // rojo
@@ -40,26 +43,30 @@ class StockTable extends BaseWidget
                     }),
                 TextColumn::make('price')
                     ->label('Precio')
+                    ->visibleFrom('md')
                     ->money('ARS', locale: 'es_AR')
                     ->sortable(),
-                    TextColumn::make('total')
-                    ->formatStateUsing(fn ($record) => $record->price * $record->quantity)
-                    ->label('Precio Total')
-                    ->money('ARS', locale: 'es_AR'),
+                TextColumn::make('total')
+                    ->label('Total')
+                    ->visibleFrom('md')
+                    ->getStateUsing(fn($record) => $record->price * $record->quantity)
+                    ->money('ARS', locale: 'es_AR')
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
+                    ->button()
+                    ->size(ActionSize::Medium)
+                    ->hiddenLabel()
                     ->form([
+                        Forms\Components\TextInput::make('name')
+                            ->label('Nombre')
+                            ->required()
+                            ->disabled(),
                         Forms\Components\Grid::make(2)->schema([
-                            Forms\Components\TextInput::make('name')
-                                ->label('Nombre')
-                                ->required()
-                                ->disabled(),
-
-                            Forms\Components\FileUpload::make('urlImage')
+                            /*                             Forms\Components\FileUpload::make('urlImage')
                                 ->label('Imagen')
                                 ->image()
-                                ->disabled(),
+                                ->disabled(), */
 
                             Forms\Components\TextInput::make('quantity')
                                 ->label('Cantidad')

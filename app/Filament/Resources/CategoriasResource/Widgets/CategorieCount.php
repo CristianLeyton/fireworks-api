@@ -34,7 +34,7 @@ class CategorieCount extends BaseWidget
                         ',', // separador decimal
                         '.' // separador de miles
                     )
-                )
+                )/* ->chart([7, 2, 10, 3, 15, 4, 17]) */
                     ->description('Valor total')
                     ->descriptionIcon('heroicon-o-banknotes', IconPosition::Before)
                     ->color('success')

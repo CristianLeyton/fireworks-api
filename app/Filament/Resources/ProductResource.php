@@ -7,11 +7,13 @@ use App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\Product;
 use Filament\Forms;
 use Filament\Forms\Form;
+
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Support\Enums\ActionSize;
 
 class ProductResource extends Resource
 {
@@ -77,15 +79,18 @@ class ProductResource extends Resource
                     ->square(),
                 Tables\Columns\TextColumn::make('sku')
                     ->label('Codigo SKU')
-                    ->searchable(),
+                    ->searchable()
+                    ->visibleFrom('md'),
                 Tables\Columns\TextColumn::make('price')
                     ->label('Precio')
                     ->money('ARS', locale: 'es_AR')
-                    ->sortable(),
+                    ->sortable()
+                    ->visibleFrom('md'),
                 Tables\Columns\TextColumn::make('quantity')
                     ->label('Cantidad')
                     ->numeric()
                     ->sortable()
+                    ->visibleFrom('md')
                     ->color(fn ($state) => match (true) {
                         $state < 5 => 'danger',   // rojo
                         $state < 10 => 'warning', // amarillo
@@ -94,25 +99,29 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('categorie.name')
                     ->label('Categoría')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->visibleFrom('md'),
                 Tables\Columns\TextColumn::make('created_at')
                 ->label('Fecha de creación')
                     ->dateTime()
                     ->sortable()
+                    ->visibleFrom('md')
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                 ->label('Fecha de actualización')
                     ->dateTime()
                     ->sortable()
+                    ->visibleFrom('md')
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-            ])
+                Tables\Actions\ViewAction::make()->hiddenLabel()->size(ActionSize::ExtraSmall)->extraAttributes(['class' => 'hidden']),
+                Tables\Actions\EditAction::make()->button()->hiddenLabel()->size(ActionSize::Medium),
+                Tables\Actions\DeleteAction::make()->button()->hiddenLabel()->size(ActionSize::Medium),
+                ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
