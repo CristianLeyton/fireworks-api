@@ -41,7 +41,7 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            'url' => env('APP_URL') . '/storage',
             'visibility' => 'public',
             'throw' => false,
             'report' => false,
@@ -61,11 +61,11 @@ return [
         ],
 
         'public_storage' => [
-        'driver' => 'local',
-        'root' => base_path('public/storage_public'),
-        /* 'root' => base_path('../storage_public'), ESTO VA AL SUBIRLO A INFINITYFREE*/
-        'url' => env('APP_URL').'/storage_public',
-        'visibility' => 'public',
+            'driver' => 'local',
+            'root' => public_path('storage_public'),
+            /* 'root' => base_path('../storage_public'), ESTO VA AL SUBIRLO A INFINITYFREE*/
+            'url' => env('APP_URL') . '/storage_public',
+            'visibility' => 'public',
         ]
 
     ],

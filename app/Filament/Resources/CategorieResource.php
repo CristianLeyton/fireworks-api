@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Support\Enums\ActionSize;
 use Filament\Support\Enums\Alignment;
+use Filament\Notifications\Notification;
 
 class CategorieResource extends Resource
 {
@@ -50,8 +51,8 @@ class CategorieResource extends Resource
                     ->columnSpan('full'),
             ]),
         ];
-    }   
-    
+    }
+
     public static function form(Form $form): Form
     {
         return $form->schema(self::getFormSchema());
@@ -60,23 +61,30 @@ class CategorieResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('name', 'asc')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                ->label('Nombre')
+                    ->label('Nombre')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\ImageColumn::make('urlImage')
                     ->label('Imagen')
                     ->square(),
+                Tables\Columns\TextColumn::make('products_count')
+                    ->label('Productos')
+                    ->counts('products')
+                    ->sortable()
+                    ->alignCenter()
+                    ->visibleFrom('md'),
                 Tables\Columns\TextColumn::make('created_at')
-                ->label('Fecha de creación')
+                    ->label('Fecha de creación')
                     ->dateTime()
                     ->sortable()
                     ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: false)
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->visibleFrom('md'),
                 Tables\Columns\TextColumn::make('updated_at')
-                ->label('Fecha de actualización')
+                    ->label('Fecha de actualización')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
@@ -88,11 +96,39 @@ class CategorieResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make()->hiddenLabel()->size(ActionSize::ExtraSmall)->extraAttributes(['class' => 'hidden']),
                 Tables\Actions\EditAction::make()->button()->hiddenLabel()->size(ActionSize::Medium),
-                Tables\Actions\DeleteAction::make()->button()->hiddenLabel()->size(ActionSize::Medium),
+                Tables\Actions\DeleteAction::make()
+                    ->button()
+                    ->hiddenLabel()
+                    ->size(ActionSize::Medium)
+                    ->before(function ($action, $record) {
+                        if ($record->products()->count() > 0) {
+                            Notification::make()
+                                ->danger()
+                                ->title('Error al eliminar')
+                                ->body('No se puede eliminar una categoría que tiene productos asociados.')
+                                ->send();
+
+                            $action->cancel();
+                        }
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->before(function ($action, $records) {
+                            foreach ($records as $record) {
+                                if ($record->products()->count() > 0) {
+                                    Notification::make()
+                                        ->danger()
+                                        ->title('Error al eliminar')
+                                        ->body('No se pueden eliminar categorías que tienen productos asociados.')
+                                        ->send();
+
+                                    $action->cancel();
+                                    return;
+                                }
+                            }
+                        }),
                 ]),
             ]);
     }
@@ -103,6 +139,4 @@ class CategorieResource extends Resource
             'index' => Pages\ManageCategories::route('/'),
         ];
     }
-
-    
 }

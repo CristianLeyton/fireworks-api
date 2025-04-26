@@ -54,7 +54,7 @@ class ProductResource extends Resource
                     ->label('Cantidad: ')
                     ->numeric()
                     ->default(null),
-                    Forms\Components\Select::make('categorie_id')
+                Forms\Components\Select::make('categorie_id')
                     ->label('Categoría: ')
                     ->relationship('categorie', 'name')
                     ->required()
@@ -69,6 +69,7 @@ class ProductResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('name', 'asc')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nombre')
@@ -91,7 +92,7 @@ class ProductResource extends Resource
                     ->numeric()
                     ->sortable()
                     ->visibleFrom('md')
-                    ->color(fn ($state) => match (true) {
+                    ->color(fn($state) => match (true) {
                         $state < 5 => 'danger',   // rojo
                         $state < 10 => 'warning', // amarillo
                         default => 'success',     // verde
@@ -102,26 +103,30 @@ class ProductResource extends Resource
                     ->sortable()
                     ->visibleFrom('md'),
                 Tables\Columns\TextColumn::make('created_at')
-                ->label('Fecha de creación')
+                    ->label('Fecha de creación')
                     ->dateTime()
                     ->sortable()
                     ->visibleFrom('md')
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
-                ->label('Fecha de actualización')
+                    ->label('Fecha de actualización')
                     ->dateTime()
                     ->sortable()
                     ->visibleFrom('md')
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('categorie_id')
+                    ->label('Categoría')
+                    ->relationship('categorie', 'name')
+                    ->searchable()
+                    ->preload(),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()->hiddenLabel()->size(ActionSize::ExtraSmall)->extraAttributes(['class' => 'hidden']),
                 Tables\Actions\EditAction::make()->button()->hiddenLabel()->size(ActionSize::Medium),
                 Tables\Actions\DeleteAction::make()->button()->hiddenLabel()->size(ActionSize::Medium),
-                ])
+            ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
