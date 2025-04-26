@@ -60,6 +60,9 @@ class StockTable extends BaseWidget
                     ->form([
                         Forms\Components\TextInput::make('name')
                             ->label('Nombre')
+                            ->validationMessages([
+                                'required' => 'El nombre es requerido',
+                            ])
                             ->required()
                             ->disabled(),
                         Forms\Components\Grid::make(2)->schema([
@@ -72,13 +75,21 @@ class StockTable extends BaseWidget
                                 ->label('Cantidad')
                                 ->numeric()
                                 ->required()
-                                ->minValue(0),
+                                ->minValue(0)
+                                ->validationMessages([
+                                    'required' => 'La cantidad es requerida',
+                                    'min' => 'La cantidad no puede ser negativa',
+                                ]),
 
                             Forms\Components\TextInput::make('price')
                                 ->label('Precio')
                                 ->numeric()
                                 ->required()
-                                ->minValue(0),
+                                ->minValue(0)
+                                ->validationMessages([
+                                    'required' => 'El precio es requerido',
+                                    'min' => 'El precio no puede ser negativo',
+                                ]),
                         ]),
                     ])
                     ->modalHeading('Editar cantidad y precio'),

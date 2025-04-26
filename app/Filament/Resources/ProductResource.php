@@ -32,11 +32,17 @@ class ProductResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->label('Nombre: ')
                     ->required()
+                    ->validationMessages([
+                        'required' => 'El nombre es requerido',
+                    ])
                     ->maxLength(255),
                 Forms\Components\FileUpload::make('urlImage')
                     ->label('Imagen: ')
                     ->image()
-                    ->required(),
+                    ->required()
+                    ->validationMessages([
+                        'required' => 'La imagen es requerida',
+                    ]),
                 Forms\Components\TextInput::make('sku')
                     ->label('SKU: ')
                     ->unique(Product::class, 'sku', ignoreRecord: true)
@@ -49,11 +55,18 @@ class ProductResource extends Resource
                     ->label('Precio: ')
                     ->required()
                     ->numeric()
-                    ->prefix('ARS $'),
+                    ->prefix('ARS $')
+                    ->validationMessages([
+                        'required' => 'El precio es requerido',
+                        'numeric' => 'El precio debe ser un numero',
+                    ]),
                 Forms\Components\TextInput::make('quantity')
                     ->label('Cantidad: ')
                     ->numeric()
-                    ->default(null),
+                    ->default(null)
+                    ->validationMessages([
+                        'numeric' => 'La cantidad debe ser un numero',
+                    ]),
                 Forms\Components\Select::make('categorie_id')
                     ->label('Categoría: ')
                     ->relationship('categorie', 'name')

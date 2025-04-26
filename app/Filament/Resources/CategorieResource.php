@@ -33,6 +33,9 @@ class CategorieResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->label('Nombre: ')
                     ->required()
+                    ->validationMessages([
+                        'required' => 'El nombre es requerido',
+                    ])
                     ->maxLength(255)
                     ->columnSpan([
                         'default' => 'full',
@@ -42,6 +45,9 @@ class CategorieResource extends Resource
                     ->label('Imagen: ')
                     ->image()
                     ->required()
+                    ->validationMessages([
+                        'required' => 'La imagen es requerida',
+                    ])
                     ->columnSpan([
                         'default' => 'full',
                         'lg' => 1,
